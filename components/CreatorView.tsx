@@ -6,7 +6,7 @@ export default function CreatorView({ isAdmin, onSaveSuccess }: { isAdmin: boole
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState('');
   const [lectureName, setLectureName] = useState('');
-  const [course, setCourse] = useState('COSC1336');
+  const [course, setCourse] = useState('');
   const [cards, setCards] = useState<any[]>([]);
 
   const handleGenerate = async () => {

@@ -75,9 +75,43 @@ export default function StudyView() {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
       <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <FilterGroup label="1. Course" items={availableCourses} selected={selectedCourses} onToggle={(i:any) => toggle(i, selectedCourses, setSelectedCourses)} />
-        <FilterGroup label="2. Lectures" items={availableLectures} selected={selectedLectures} onToggle={(i:any) => toggle(i, selectedLectures, setSelectedLectures)} border />
-        <FilterGroup label="3. Topics" items={availableTopics} selected={selectedTopics} onToggle={(i:any) => toggle(i, selectedTopics, setSelectedTopics)} border />
+        <FilterGroup 
+          label="1. Course" items={availableCourses} selected={selectedCourses} 
+          onToggle={(i:any) => {
+              toggle(i, selectedCourses, setSelectedCourses);
+              setSelectedLectures([]); // Reset lectures when course changes
+              setSelectedTopics([]);   // Reset topics when course changes
+          }} 
+        />
+        <FilterGroup label="2. Lectures" items={availableLectures} selected={selectedLectures} 
+          onToggle={(i:any) => {
+              toggle(i, selectedLectures, setSelectedLectures);
+              setSelectedTopics([]); // Reset topics when lecture changes
+          }} 
+          border 
+        />
+        <div className={`space-y-2 border-l md:pl-8 border-gray-100`}>
+          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">3. Topics</label>
+          <div className="flex flex-wrap gap-2">
+            {selectedLectures.length === 0 ? (
+              <p className="text-[11px] text-gray-300 italic py-1 leading-relaxed">
+                Please select a lecture to see specific topics...
+              </p>
+            ) : availableTopics.length === 0 ? (
+              <p className="text-[11px] text-gray-300 italic py-1">No topics found for this lecture.</p>
+            ) : (
+              availableTopics.map((item: string) => (
+                <button 
+                  key={item} 
+                  onClick={() => toggle(item, selectedTopics, setSelectedTopics)} 
+                  className={`px-3 py-1 text-xs rounded-lg border-2 transition-all ${selectedTopics.includes(item) ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-gray-100 text-gray-600'}`}
+                >
+                  {item}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

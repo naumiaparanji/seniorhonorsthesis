@@ -20,8 +20,14 @@ export default function LoginPage() {
       <form onSubmit={handleLogin} className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
         <h1 className="text-2xl font-black mb-6">Admin Access</h1>
         <div className="space-y-4">
-          <input type="email" placeholder="Email" className="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" value={email} onChange={e => setEmail(email)} />
-          <input type="password" placeholder="Password" className="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" value={password} onChange={e => setPassword(password)} />
+          <input type="email" placeholder="Email" 
+            className="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" 
+            value={email} onChange={e => setEmail(e.target.value)} 
+          />
+          <input type="password" placeholder="Password" 
+            className="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" 
+            value={password} onChange={e => setPassword(e.target.value)} 
+          />
           <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold">Login</button>
         </div>
       </form>
