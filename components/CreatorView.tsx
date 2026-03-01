@@ -1,13 +1,24 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // 1. Added useEffect
 import { supabase } from '@/utils/supabase';
 
 export default function CreatorView({ isAdmin, onSaveSuccess }: { isAdmin: boolean, onSaveSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState('');
   const [lectureName, setLectureName] = useState('');
-  const [course, setCourse] = useState('');
+  const [course, setCourse] = useState('COSC1336'); // Default for testing
   const [cards, setCards] = useState<any[]>([]);
+  const [existingTopics, setExistingTopics] = useState<string[]>([]); // 2. Added topics state
+
+  // 3. Fetch existing topics to pass to the AI
+  useEffect(() => {
+    const fetchTopics = async () => {
+      const { data } = await supabase.from('flashcards').select('topics');
+      const flattened = data?.flatMap(i => i.topics) || [];
+      setExistingTopics(Array.from(new Set(flattened)).filter(Boolean) as string[]);
+    };
+    fetchTopics();
+  }, [course]);
 
   const handleGenerate = async () => {
     if (!notes.trim() || !lectureName.trim()) return alert("Fill all fields");
@@ -15,18 +26,31 @@ export default function CreatorView({ isAdmin, onSaveSuccess }: { isAdmin: boole
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
-        body: JSON.stringify({ notes, course, lecture: lectureName }),
+        headers: { 'Content-Type': 'application/json' }, // 4. Added headers
+        body: JSON.stringify({ notes, course, lecture: lectureName, existingTopics }), // 5. Added existingTopics
       });
+      
       const aiCards = await res.json();
-      setCards(aiCards.map((c: any) => ({ ...c, course, lecture: lectureName })));
-    } catch (err) { console.error(err); }
+      
+      // 6. Check if aiCards exists and is an array before setting state
+      if (aiCards && Array.isArray(aiCards)) {
+        setCards(aiCards.map((c: any) => ({ ...c, course, lecture: lectureName })));
+      } else {
+        alert("AI failed to return valid cards. Check API logs.");
+        console.error(aiCards);
+      }
+    } catch (err) { 
+      console.error(err); 
+      alert("Error generating cards.");
+    }
     setLoading(false);
   };
 
   const downloadCSV = () => {
-    // Format: Question, Answer, Tags
+    if (cards.length === 0) return;
+    // Format: Question, Answer, Topics
     const header = "Question,Answer,Topics\n";
-    const rows = cards.map(c => `"${c.question}","${c.answer}","${c.topics.join(';')}"`).join("\n");
+    const rows = cards.map(c => `"${c.question.replace(/"/g, '""')}","${c.answer.replace(/"/g, '""')}","${c.topics.join(';')}"`).join("\n");
     const blob = new Blob([header + rows], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -38,7 +62,18 @@ export default function CreatorView({ isAdmin, onSaveSuccess }: { isAdmin: boole
   const saveToDB = async () => {
     if (!isAdmin) return;
     setLoading(true);
-    const { error } = await supabase.from('flashcards').insert(cards);
+    // 7. Ensure data matches database schema (importance and category)
+    const formattedCards = cards.map(c => ({
+      course: c.course,
+      lecture: c.lecture,
+      topics: c.topics,
+      question: c.question,
+      answer: c.answer,
+      category: c.category || 'What', // Fallback
+      importance: c.importance || 3    // Fallback
+    }));
+
+    const { error } = await supabase.from('flashcards').insert(formattedCards);
     if (!error) {
       alert("Database Updated!");
       onSaveSuccess();
@@ -70,7 +105,13 @@ export default function CreatorView({ isAdmin, onSaveSuccess }: { isAdmin: boole
           
           {cards.map((c, i) => (
             <div key={i} className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
-              <div className="flex gap-2 mb-2">
+              <div className="flex gap-2 mb-2 items-center">
+                {/* 8. Added Badge visualization here too */}
+                <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded border ${
+                    c.category === 'What' ? 'bg-blue-50 border-blue-200 text-blue-600' :
+                    c.category === 'How' ? 'bg-orange-50 border-orange-200 text-orange-600' :
+                    'bg-purple-50 border-purple-200 text-purple-600'
+                }`}>{c.category}</span>
                 {c.topics.map((t: string) => <span key={t} className="text-[8px] font-black uppercase px-2 py-0.5 bg-gray-50 text-gray-500 rounded border border-gray-200">{t}</span>)}
               </div>
               <p className="font-bold text-gray-800">Q: {c.question}</p>

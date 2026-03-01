@@ -10,6 +10,8 @@ type Flashcard = {
   topics: string[];
   question: string;
   answer: string;
+  category: 'What' | 'How' | 'Why'; 
+  importance: number;              
 };
 
 export default function StudyView() {
@@ -58,11 +60,42 @@ export default function StudyView() {
     const fetchCards = async () => {
       setLoading(true);
       let query = supabase.from('flashcards').select('*');
+      
       if (selectedCourses.length) query = query.in('course', selectedCourses);
       if (selectedLectures.length) query = query.in('lecture', selectedLectures);
-      if (selectedTopics.length) query = query.overlaps('topics', selectedTopics);
+      
+      // We fetch all cards for the lecture, then filter/sort in JS for the "Intersection" logic
       const { data } = await query;
-      setCards(data || []);
+      
+      if (data) {
+        const sorted = [...data].sort((a, b) => {
+          // 1. Primary Sort: Category (What -> How -> Why)
+          const catOrder: Record<string, number> = { 'What': 0, 'How': 1, 'Why': 2 };
+          if (catOrder[a.category] !== catOrder[b.category]) {
+            return catOrder[a.category] - catOrder[b.category];
+          }
+
+          // 2. Secondary Sort: Intersection Depth (Match Count)
+          // Count how many of the student's selected topics are in this card
+          const aMatches = a.topics.filter((t: string) => selectedTopics.includes(t)).length;
+          const bMatches = b.topics.filter((t: string) => selectedTopics.includes(t)).length;
+          
+          if (aMatches !== bMatches) {
+            return bMatches - aMatches; // Higher matches first
+          }
+
+          // 3. Tertiary Sort: Importance (Tie-breaker)
+          return (b.importance || 0) - (a.importance || 0);
+        });
+
+        // If user selected specific topics, we only show cards that have AT LEAST one match
+        // OR show all if no topics are selected.
+        const filtered = selectedTopics.length > 0 
+          ? sorted.filter(card => card.topics.some((t: string) => selectedTopics.includes(t)))
+          : sorted;
+
+        setCards(filtered);
+      }
       setLoading(false);
     };
     fetchCards();
@@ -114,21 +147,51 @@ export default function StudyView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {cards.map(card => (
-          <div key={card.id} onClick={() => setFlippedId(flippedId === card.id ? null : card.id)} className="h-64 cursor-pointer perspective-1000">
-            <div className={`relative w-full h-full transition-all duration-700 preserve-3d ${flippedId === card.id ? 'rotate-y-180' : ''}`}>
-              <div className="absolute inset-0 backface-hidden bg-white border-2 border-gray-100 rounded-[2rem] flex flex-col items-center justify-center p-10 text-center border-b-[6px] border-b-gray-200">
-                <span className="absolute top-6 text-[8px] font-black text-green-500 uppercase">{card.lecture}</span>
-                <p className="text-lg font-bold">{card.question}</p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {cards.map(card => (
+        <div key={card.id} onClick={() => setFlippedId(flippedId === card.id ? null : card.id)} className="h-64 cursor-pointer perspective-1000">
+          <div className={`relative w-full h-full transition-all duration-700 preserve-3d ${flippedId === card.id ? 'rotate-y-180' : ''}`}>
+            
+            {/* FRONT OF CARD */}
+            <div className="absolute inset-0 backface-hidden bg-white border-2 border-gray-100 rounded-[2rem] flex flex-col items-center justify-center p-10 text-center border-b-[6px] border-b-gray-200">
+              
+              {/* --- ADD THIS BADGE SECTION --- */}
+              <div className="absolute top-6 flex flex-col items-center gap-1">
+                <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">{card.lecture}</span>
+                <div className="flex gap-1">
+                  <span className={`text-[7px] font-bold px-2 py-0.5 rounded border ${
+                    card.category === 'What' ? 'bg-blue-50 border-blue-200 text-blue-600' :
+                    card.category === 'How' ? 'bg-orange-50 border-orange-200 text-orange-600' :
+                    'bg-purple-50 border-purple-200 text-purple-600'
+                  }`}>
+                    {card.category}
+                  </span>
+                  {card.importance >= 4 && (
+                    <span className="text-[7px] font-bold px-2 py-0.5 bg-red-50 border border-red-200 text-red-600 rounded">
+                      High Yield
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="absolute inset-0 backface-hidden rotate-y-180 bg-blue-600 text-white border-2 border-blue-700 rounded-[2rem] flex flex-col items-center justify-center p-10 text-center border-b-[6px] border-b-blue-800">
-                <p className="text-md leading-relaxed">{card.answer}</p>
+              {/* ------------------------------ */}
+
+              <p className="text-lg font-bold mt-6">{card.question}</p>
+            </div>
+
+            {/* BACK OF CARD */}
+            <div className="absolute inset-0 backface-hidden rotate-y-180 bg-blue-600 text-white border-2 border-blue-700 rounded-[2rem] flex flex-col items-center justify-center p-10 text-center border-b-[6px] border-b-blue-800">
+              <p className="text-md leading-relaxed">{card.answer}</p>
+              {/* Optional: Show topics on the back */}
+              <div className="absolute bottom-6 flex gap-1 flex-wrap justify-center">
+                {card.topics.map(t => (
+                    <span key={t} className="text-[7px] bg-blue-500 px-2 py-0.5 rounded-full">{t}</span>
+                ))}
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+    </div>
     </div>
   );
 }
