@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Force the SDK to use the stable 'v1' instead of 'v1beta'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(req) {
@@ -12,7 +11,6 @@ export async function POST(req) {
         { apiVersion: 'v1' } 
     );
 
-    // FIX: Use ?.join to prevent crashing if existingTopics is null/undefined
     const prompt = `Analyze this lecture transcript: "${notes}"
                     Course: "${course}"
                     Lecture Name: "${lecture}"
@@ -35,9 +33,9 @@ export async function POST(req) {
                     PRINCIPLES:
                     1. HIGH-YIELD: Focus on definitions, processes, and causal relationships. Prioritize depth and exam utility over covering every minor sentence.
                     2. ATOMICITY: Each card must cover exactly one discrete idea. Split complex concepts into multiple cards.
-                    3. FORMAT VARIETY: 
-                        - Use 'Basic' (Question/Answer) as the primary format. 
-                        - Use 'Cloze' (fill-in-the-blank using [___]) ONLY for technical terminology or specific parts of a process 
+                    3. FORMAT VARIETY (no labeling, just content): 
+                        - Use basic (Question/Answer) as the primary format. 
+                        - Use cloze (fill-in-the-blank using [___]) ONLY for technical terminology or specific parts of a process 
                         where seeing the context is essential for memorization.
                     4. ACCURACY: Do not hallucinate. Use only the logic provided in the transcript.
 
