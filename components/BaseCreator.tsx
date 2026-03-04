@@ -4,14 +4,14 @@ import { supabase } from '@/utils/supabase';
 
 interface BaseCreatorProps {
   userRole: 'admin' | 'student';
-  actionButton: (cards: any[]) => React.ReactNode; 
+  actionButton: (cards: any[]) => React.ReactNode;
 }
 
 export default function BaseCreator({ userRole, actionButton }: BaseCreatorProps) {
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState('');
   const [lectureName, setLectureName] = useState('');
-  const [course, setCourse] = useState('COSC1336');
+  const [course, setCourse] = useState('');
   const [cards, setCards] = useState<any[]>([]);
   const [existingTopics, setExistingTopics] = useState<string[]>([]);
 
@@ -46,15 +46,57 @@ export default function BaseCreator({ userRole, actionButton }: BaseCreatorProps
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-20">
+    <div className="max-w-3xl mx-auto space-y-8 pb-20">
+      {/* Header */}
+      <div className="px-1">
+        <h2 className="text-xl font-semibold tracking-tight">Flashcard Creator</h2>
+        <p className="text-sm ui-muted mt-1">
+          Paste a transcript, generate a preview, then {userRole === 'admin' ? 'save to the database.' : 'request cards.'}
+        </p>
+      </div>
+
       {/* Input Section */}
-      <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <input className="p-3 border rounded-xl bg-gray-50 font-bold" placeholder="Course" value={course} onChange={e => setCourse(e.target.value)} />
-          <input className="p-3 border rounded-xl" placeholder="Lecture Name" value={lectureName} onChange={e => setLectureName(e.target.value)} />
+      <div className="ui-card p-6 sm:p-8 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs ui-muted font-medium">Course</label>
+            <input
+              className="w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              placeholder="Course Name"
+              value={course}
+              onChange={e => setCourse(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs ui-muted font-medium">Lecture name</label>
+            <input
+              className="w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              placeholder="Lecture Name"
+              value={lectureName}
+              onChange={e => setLectureName(e.target.value)}
+            />
+          </div>
         </div>
-        <textarea className="w-full h-48 p-5 border-2 border-gray-50 rounded-2xl mb-4 outline-none focus:border-blue-200 transition-all" placeholder="Paste transcript..." value={notes} onChange={e => setNotes(e.target.value)} />
-        <button onClick={handleGenerate} disabled={loading} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg disabled:opacity-50">
+
+        <div className="space-y-1.5">
+          <label className="text-xs ui-muted font-medium">Transcript</label>
+          <textarea
+            className="w-full h-48 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            placeholder="Paste transcript..."
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+          />
+          <p className="text-xs ui-muted">
+            Tip: Longer transcripts work best when they’re clean (no timestamps, minimal speaker tags).
+          </p>
+        </div>
+
+        <button
+          onClick={handleGenerate}
+          disabled={loading}
+          className="ui-btn ui-btn-primary ui-ring-accent w-full disabled:opacity-50"
+        >
           {loading ? "AI is working..." : "Generate Preview"}
         </button>
       </div>
@@ -62,23 +104,55 @@ export default function BaseCreator({ userRole, actionButton }: BaseCreatorProps
       {/* Preview Section */}
       {cards.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest px-4">Preview ({cards.length} Cards)</h3>
-          {cards.map((c, i) => (
-            <div key={i} className="group relative p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-red-100 transition-all">
-              <button onClick={() => removeCard(i)} className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                <TrashIcon />
-              </button>
-              <div className="flex gap-2 mb-2 items-center">
-                <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded border bg-blue-50 text-blue-600">{c.category}</span>
-                {c.topics.map((t: any) => <span key={t} className="text-[8px] font-black uppercase px-2 py-0.5 bg-gray-50 text-gray-400 rounded border">{t}</span>)}
-              </div>
-              <p className="font-bold text-gray-800 pr-8">Q: {c.question}</p>
-              <p className="text-gray-500 text-sm mt-1 italic">A: {c.answer}</p>
+          <div className="flex items-end justify-between px-1">
+            <div>
+              <h3 className="text-lg font-semibold">Preview</h3>
+              <p className="text-sm ui-muted">{cards.length} cards generated</p>
             </div>
-          ))}
+            <p className="text-xs ui-muted">Remove any cards you don’t want.</p>
+          </div>
 
-          {/* This is the "Slot" where the specialized button goes */}
-          <div className="pt-6">
+          <div className="grid grid-cols-1 gap-4">
+            {cards.map((c, i) => (
+              <div
+                key={i}
+                className="ui-card relative p-5 sm:p-6 transition hover:shadow-sm"
+              >
+                <button
+                  onClick={() => removeCard(i)}
+                  className="ui-ring-accent absolute top-4 right-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--muted)] hover:text-black hover:bg-[var(--accent-soft)] transition"
+                  title="Remove card"
+                >
+                  <TrashIcon />
+                </button>
+
+                <div className="flex flex-wrap gap-2 pr-10 mb-3">
+                  <span className="text-[11px] px-2 py-1 rounded-full border border-[var(--border)] bg-white ui-muted">
+                    {c.category}
+                  </span>
+
+                  {Array.isArray(c.topics) && c.topics.map((t: any) => (
+                    <span
+                      key={t}
+                      className="text-[11px] px-2 py-1 rounded-full bg-[var(--accent-soft)] text-black/80"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                <p className="font-semibold leading-snug">
+                  <span className="ui-muted font-medium">Q:</span> {c.question}
+                </p>
+                <p className="text-sm ui-muted mt-2 leading-relaxed">
+                  <span className="font-medium">A:</span> {c.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Slot for admin/student action button */}
+          <div className="pt-2">
             {actionButton(cards)}
           </div>
         </div>

@@ -26,44 +26,79 @@ export default function FlashcardApp() {
   const isAdmin = !!session;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 text-gray-900 font-sans">
-      <nav className="flex items-center justify-between max-w-6xl mx-auto mb-8">
-        <div className="flex gap-4">
-          <button 
-            onClick={() => setView('study')} 
-            className={`px-6 py-2 rounded-full font-bold transition ${view === 'study' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white border text-gray-500'}`}
-          >
-            Study
-          </button>
-          <button 
-            onClick={() => setView('create')} 
-            className={`px-6 py-2 rounded-full font-bold transition ${view === 'create' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white border text-gray-500'}`}
-          >
-            Creator
-          </button>
-        </div>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+      {/* Top bar */}
+      <header className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+          {/* Brand */}
+          <div className="flex items-center gap-3">
+            <div className="ui-card flex h-9 w-9 items-center justify-center">
+              <span className="text-sm font-semibold">FC</span>
+            </div>
+            <div className="leading-tight">
+              <div className="text-sm font-semibold">Flashcards</div>
+              <div className="text-xs ui-muted">Study • Create • Review</div>
+            </div>
+          </div>
 
-        {isAdmin ? (
-          <button onClick={() => supabase.auth.signOut()} className="text-xs font-bold text-red-400 border border-red-100 px-4 py-2 rounded-xl hover:bg-red-50 transition-all">
-            Admin Logout
-          </button>
-        ) : (
-          <Link href="/login" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-all">
-            Admin Login
-          </Link>
-        )}
-      </nav>
+          {/* View toggle */}
+          <div className="ui-card flex items-center gap-2 p-1">
+            <button
+              onClick={() => setView("study")}
+              className={`ui-btn ui-ring-accent px-4 py-2 text-sm ${
+                view === "study"
+                  ? "bg-[#111111] text-white"
+                  : "bg-transparent text-[var(--muted)] hover:opacity-80"
+              }`}
+            >
+              Study
+            </button>
+            <button
+              onClick={() => setView("create")}
+              className={`ui-btn ui-ring-accent px-4 py-2 text-sm ${
+                view === "create"
+                  ? "bg-[#111111] text-white"
+                  : "bg-transparent text-[var(--muted)] hover:opacity-80"
+              }`}
+            >
+              Creator
+            </button>
+          </div>
 
-      <main>
-        {view === 'study' ? (
-          <StudyView />
-        ) : (
-          isAdmin ? (
-            <CreatorViewAdmin onSaveSuccess={() => setView('study')} />
+          {/* Auth action */}
+          <div>
+            {isAdmin ? (
+              <button
+                onClick={() => supabase.auth.signOut()}
+                className="ui-btn ui-ring-accent ui-btn-primary text-xs"
+                title="Sign out admin session"
+              >
+                Admin Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="ui-btn ui-ring-accent ui-btn-primary text-xs inline-flex items-center"
+              >
+                Admin Login
+              </Link>
+            )}
+          </div>
+        </nav>
+      </header>
+
+      {/* Page body */}
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {/* Content surface */}
+        <section className="ui-card p-4 sm:p-6">
+          {view === "study" ? (
+            <StudyView />
+          ) : isAdmin ? (
+            <CreatorViewAdmin onSaveSuccess={() => setView("study")} />
           ) : (
             <CreatorViewStudent />
-          )
-        )}
+          )}
+        </section>
       </main>
     </div>
   );

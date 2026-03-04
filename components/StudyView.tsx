@@ -101,8 +101,9 @@ export default function StudyView() {
       const matchesTopic = selectedTopics.length === 0 || card.topics.some(t => selectedTopics.includes(t));
       const matchesCategory = activeCategories.includes(card.category);
       const matchesImportance = card.importance >= minImportance;
-      const matchesSearch = card.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            card.topics.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesSearch =
+        card.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.topics.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
 
       return matchesTopic && matchesCategory && matchesImportance && matchesSearch;
     });
@@ -117,146 +118,206 @@ export default function StudyView() {
   }, [allFetchedCards, selectedTopics, activeCategories, minImportance, searchQuery]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 pb-20 px-4">
-      
-      {/* 1. WELCOME HERO */}
-      <div className="bg-indigo-900 text-white p-10 rounded-[2.5rem] shadow-2xl shadow-indigo-100/50">
-        <h1 className="text-3xl font-black mb-4">Welcome to Flashcards for VideoPoints</h1>
-        <p className="text-indigo-100 leading-relaxed max-w-3xl opacity-90">
-          Study smarter by selecting your course and specific lectures. Use the <b>Refine Bar</b> to focus on high-yield topics or specific types of questions.
-        </p>
-      </div>
+    <div className="space-y-8">
 
-      {/* 2. PROGRESSIVE SELECTION GRID */}
-      <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        {/* Step 1: Course */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">1. Course</label>
-          <div className="flex flex-wrap gap-2">
-            {availableCourses.map(c => (
-              <button key={c} onClick={() => { setSelectedCourses([c]); setSelectedLectures([]); setSelectedTopics([]); }}
-                className={`px-3 py-1.5 text-xs rounded-xl border-2 font-bold transition-all ${selectedCourses.includes(c) ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-gray-50 text-gray-500 hover:border-indigo-100'}`}>
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Step 2: Multi-Lecture Selection */}
-        <div className={`space-y-2 border-l border-gray-100 md:pl-8 transition-all duration-500 ${selectedCourses.length > 0 ? 'opacity-100' : 'opacity-20 pointer-events-none'}`}>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">2. Lectures</label>
-          <div className="flex flex-wrap gap-2">
-            {availableLectures.map(l => (
-              <button key={l} 
-                onClick={() => {
-                  const next = selectedLectures.includes(l) ? selectedLectures.filter(x => x !== l) : [...selectedLectures, l];
-                  setSelectedLectures(next);
-                  setSelectedTopics([]); 
-                }}
-                className={`px-3 py-1.5 text-xs rounded-xl border-2 font-bold transition-all ${selectedLectures.includes(l) ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-gray-50 text-gray-500 hover:border-indigo-100'}`}>
-                {l}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Step 3: Sub-Topics */}
-        <div className="space-y-2 border-l border-gray-100 md:pl-8">
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-            3. Sub-Topics
-          </label>
-          
-          <div className="flex flex-wrap gap-2 min-h-[40px]">
-            {selectedLectures.length > 0 ? (
-              // Show topics normally when a lecture is selected
-              availableTopics.length > 0 ? (
-                availableTopics.map(t => (
-                  <button 
-                    key={t} 
-                    onClick={() => setSelectedTopics(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])}
-                    className={`px-3 py-1.5 text-xs rounded-xl border-2 font-bold transition-all ${
-                      selectedTopics.includes(t) 
-                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' 
-                        : 'bg-white border-gray-100 text-gray-600 hover:border-indigo-100'
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))
-              ) : (
-                <p className="text-[11px] text-gray-400 italic py-1 leading-relaxed">
-                  No specific topics found for these lectures.
-                </p>
-              )
-            ) : (
-              // The "Locked" state prompt
-              <p className="text-[11px] text-gray-400/80 font-medium italic py-1 leading-relaxed">
-                Select a lecture to see specific topics...
-              </p>
-            )}
-          </div>
+      {/* 1) HERO / INTRO (minimal) */}
+      <div className="ui-card p-6 sm:p-8">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Flashcards for VideoPoints
+          </h1>
+          <p className="ui-muted text-sm leading-relaxed max-w-3xl">
+            Select a course and one or more lectures. Use filters to focus on high-yield topics and question types.
+            Click any card to flip.
+          </p>
         </div>
       </div>
 
-      {/* 3. REFINE & CONTENT AREA */}
-      {selectedLectures.length > 0 ? (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-          
-          <div className="flex justify-between items-end px-4">
-            <div>
-              <h2 className="text-xl font-black text-gray-800">Refine Results</h2>
-              <p className="text-xs text-gray-400 font-medium">Viewing {displayCards.length} cards</p>
+      {/* 2) SELECTION GRID */}
+      <div className="ui-card p-6 sm:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          {/* Course */}
+          <div className="space-y-3">
+            <div className="text-[11px] font-semibold tracking-widest uppercase ui-muted">
+              1. Course
             </div>
-            <button onClick={resetFilters} className="text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:text-red-500 transition-colors flex items-center gap-1.5">
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-              Clear Filters
+            <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
+              {availableCourses.map(c => (
+                <button
+                  key={c}
+                  onClick={() => { setSelectedCourses([c]); setSelectedLectures([]); setSelectedTopics([]); }}
+                  className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
+                    selectedCourses.includes(c)
+                      ? "bg-[var(--accent-soft)] text-black"
+                      : "bg-white text-[var(--muted)] hover:opacity-80"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Lectures */}
+          <div className={`space-y-3 md:border-l md:border-[var(--border)] md:pl-8 transition-all ${selectedCourses.length > 0 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+            <div className="text-[11px] font-semibold tracking-widest uppercase ui-muted">
+              2. Lectures
+            </div>
+            <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
+              {availableLectures.map(l => (
+                <button
+                  key={l}
+                  onClick={() => {
+                    const next = selectedLectures.includes(l) ? selectedLectures.filter(x => x !== l) : [...selectedLectures, l];
+                    setSelectedLectures(next);
+                    setSelectedTopics([]);
+                  }}
+                  className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
+                    selectedLectures.includes(l)
+                      ? "bg-[var(--accent-soft)] text-black"
+                      : "bg-white text-[var(--muted)] hover:opacity-80"
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Topics */}
+          <div className="space-y-3 md:border-l md:border-[var(--border)] md:pl-8">
+            <div className="text-[11px] font-semibold tracking-widest uppercase ui-muted">
+              3. Topics
+            </div>
+
+            <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
+              {selectedLectures.length > 0 ? (
+                availableTopics.length > 0 ? (
+                  availableTopics.map(t => (
+                    <button
+                      key={t}
+                      onClick={() => setSelectedTopics(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])}
+                      className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
+                        selectedTopics.includes(t)
+                          ? "bg-[var(--accent-soft)] text-black"
+                          : "bg-white text-[var(--muted)] hover:opacity-80"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-sm ui-muted italic">No specific topics found for these lectures.</p>
+                )
+              ) : (
+                <p className="text-sm ui-muted italic">Select a lecture to see specific topics…</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3) REFINE + CARDS */}
+      {selectedLectures.length > 0 ? (
+        <div className="space-y-6">
+
+          {/* Refine header */}
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Refine</h2>
+              <p className="text-sm ui-muted">Viewing {displayCards.length} cards</p>
+            </div>
+
+            <button
+              onClick={resetFilters}
+              className="text-sm ui-muted hover:text-black transition inline-flex items-center gap-2"
+            >
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border)] bg-white">
+                ↻
+              </span>
+              Clear filters
             </button>
           </div>
 
-          <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col lg:flex-row gap-6 items-center justify-between">
-            <div className="relative w-full lg:w-96">
-              <input type="text" placeholder="Search questions or topics..." className="w-full pl-10 pr-4 py-3.5 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-              <svg className="absolute left-3.5 top-4 text-gray-400" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          {/* Refine bar */}
+          <div className="ui-card p-4 sm:p-5 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+
+            {/* Search */}
+            <div className="relative w-full lg:w-[420px]">
+              <input
+                type="text"
+                placeholder="Search questions or topics…"
+                className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <span className="absolute left-3 top-3.5 text-[var(--muted)]">⌕</span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-8">
-              <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-2xl">
-                {['What', 'How', 'Why'].map(cat => (
-                  <button key={cat} onClick={() => setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
-                    className={`px-5 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all ${activeCategories.includes(cat) ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
-                    {cat}
-                  </button>
-                ))}
+            <div className="flex flex-wrap items-center gap-4">
+
+              {/* Category toggles */}
+              <div className="ui-card p-1 flex items-center gap-1">
+                {['What', 'How', 'Why'].map(cat => {
+                  const active = activeCategories.includes(cat);
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
+                      className={`ui-btn ui-ring-accent px-4 py-2 text-xs ${
+                        active ? "bg-[#111111] text-white" : "bg-transparent text-[var(--muted)] hover:opacity-80"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="flex items-center gap-4 bg-gray-50 px-5 py-2 rounded-2xl">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Min Imp</span>
-                <input type="range" min="1" max="5" value={minImportance} onChange={(e) => setMinImportance(parseInt(e.target.value))} className="w-20 accent-indigo-600" />
-                <span className="text-xs font-black text-indigo-600">{minImportance}</span>
+              {/* Importance */}
+              <div className="ui-card px-4 py-3 flex items-center gap-3">
+                <span className="text-xs ui-muted font-medium">Min importance</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={minImportance}
+                  onChange={(e) => setMinImportance(parseInt(e.target.value))}
+                  className="w-24 accent-[var(--accent)]"
+                />
+                <span className="text-sm font-semibold">{minImportance}</span>
               </div>
             </div>
           </div>
 
+          {/* Cards grid */}
           {loading ? (
-            <div className="text-center py-20 font-bold text-gray-300 animate-pulse">Fetching Cards...</div>
+            <div className="ui-card p-10 text-center ui-muted animate-pulse">
+              Fetching cards…
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayCards.map(card => (
-                <FlashcardItem key={card.id} card={card} isFlipped={flippedId === card.id} onFlip={() => setFlippedId(flippedId === card.id ? null : card.id)} />
+                <FlashcardItem
+                  key={card.id}
+                  card={card}
+                  isFlipped={flippedId === card.id}
+                  onFlip={() => setFlippedId(flippedId === card.id ? null : card.id)}
+                />
               ))}
             </div>
           )}
 
           {displayCards.length === 0 && !loading && (
-            <div className="text-center py-24 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
-              <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No matching cards found</p>
+            <div className="ui-card p-10 text-center">
+              <p className="text-sm ui-muted">No matching cards found.</p>
             </div>
           )}
         </div>
       ) : (
-        <div className="py-24 text-center bg-white rounded-[3rem] border border-gray-100 shadow-inner">
-          <p className="text-gray-400 text-sm font-medium">Select one or more lectures to begin.</p>
+        <div className="ui-card p-10 text-center">
+          <p className="text-sm ui-muted">Select one or more lectures to begin.</p>
         </div>
       )}
     </div>
@@ -266,42 +327,66 @@ export default function StudyView() {
 function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped: boolean, onFlip: () => void }) {
   return (
     <div onClick={onFlip} className="h-72 cursor-pointer perspective-1000 group">
-      <div className={`relative w-full h-full transition-all duration-700 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
-        
+      <div className={`relative w-full h-full transition-transform duration-700 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+
         {/* FRONT */}
-        <div className="absolute inset-0 backface-hidden bg-white border-2 border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center p-10 text-center border-b-[8px] border-b-gray-200 group-hover:border-indigo-100 transition-colors overflow-hidden">
-          
-          {/* TOP SECTION: Sub-Topics */}
-          <div className="absolute top-6 flex flex-col items-center gap-2 px-6 w-full">
-            <span className="text-[7px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-1">{card.lecture}</span>
-            <div className="flex flex-wrap justify-center gap-1 max-h-12 overflow-y-auto no-scrollbar">
+        <div className="absolute inset-0 backface-hidden ui-card p-6 flex flex-col justify-between overflow-hidden">
+          {/* Top meta */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[11px] font-medium ui-muted truncate">
+                {card.lecture}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] px-2 py-1 rounded-full border border-[var(--border)] bg-white ui-muted">
+                  {card.category}
+                </span>
+                <span className="text-[11px] px-2 py-1 rounded-full border border-[var(--border)] bg-white ui-muted">
+                  Imp {card.importance}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 max-h-14 overflow-y-auto">
               {card.topics.map(t => (
-                <span key={t} className="text-[8px] bg-gray-50 text-gray-400 font-black uppercase px-2 py-0.5 rounded border border-gray-100 tracking-tight">
-                  #{t}
+                <span
+                  key={t}
+                  className="text-[11px] px-2 py-1 rounded-full bg-[var(--accent-soft)] text-black/80"
+                >
+                  {t}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* MIDDLE SECTION: The Question */}
-          <p className="text-xl font-bold text-gray-800 leading-snug px-2 mt-4">
-            {card.question}
-          </p>
+          {/* Question */}
+          <div className="flex-1 flex items-center justify-center text-center px-2">
+            <p className="text-lg font-semibold leading-snug">
+              {card.question}
+            </p>
+          </div>
 
-          {/* BOTTOM SECTION: Metadata Chips */}
-          <div className="absolute bottom-6 flex items-center gap-1.5">
-            <span className="text-[7px] bg-gray-50 text-gray-400 font-black uppercase px-2 py-0.5 rounded border border-gray-100 tracking-tight">
-              {card.category}
-            </span>
-            <span className="text-[7px] bg-gray-50 text-gray-400 font-black uppercase px-2 py-0.5 rounded border border-gray-100 tracking-tight">
-              Imp {card.importance}
-            </span>
+          {/* Hint */}
+          <div className="text-center">
+            <p className="text-xs ui-muted">Click to reveal answer</p>
           </div>
         </div>
 
         {/* BACK */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180 bg-indigo-600 text-white border-2 border-indigo-700 rounded-[2.5rem] flex flex-col items-center justify-center p-10 text-center border-b-[8px] border-b-indigo-800 shadow-2xl shadow-indigo-200">
-          <p className="text-lg leading-relaxed font-medium">{card.answer}</p>
+        <div className="absolute inset-0 backface-hidden rotate-y-180 ui-card !bg-gray-200 p-6 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium ui-muted truncate">{card.lecture}</span>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center text-center px-2">
+            <p className="text-base leading-relaxed">
+              {card.answer}
+            </p>
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs ui-muted">Click to see question</p>
+          </div>
         </div>
       </div>
     </div>

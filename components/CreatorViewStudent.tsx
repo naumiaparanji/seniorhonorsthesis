@@ -14,13 +14,16 @@ export default function CreatorViewStudent() {
   };
 
   return (
-    <BaseCreator 
-      userRole="student" 
+    <BaseCreator
+      userRole="student"
       actionButton={(cards) => (
-        <button onClick={() => downloadCSV(cards)} className="w-full bg-blue-600 text-white py-5 rounded-3xl font-black text-lg shadow-xl hover:bg-blue-700 transition-all">
+        <button
+          onClick={() => downloadCSV(cards)}
+          className="ui-btn ui-btn-primary ui-ring-accent w-full py-4 text-sm"
+        >
           Download {cards.length} Cards (.csv)
         </button>
-      )} 
+      )}
     />
   );
 }

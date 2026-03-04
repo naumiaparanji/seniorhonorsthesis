@@ -6,7 +6,7 @@ export default function CreatorViewAdmin({ onSaveSuccess }: { onSaveSuccess: () 
   const saveToDB = async (cards: any[]) => {
     const formattedCards = cards.map(c => ({
       course: c.course, lecture: c.lecture, topics: c.topics,
-      question: c.question, answer: c.answer, 
+      question: c.question, answer: c.answer,
       category: c.category || 'What', importance: c.importance || 3
     }));
 
@@ -21,13 +21,16 @@ export default function CreatorViewAdmin({ onSaveSuccess }: { onSaveSuccess: () 
   };
 
   return (
-    <BaseCreator 
-      userRole="admin" 
+    <BaseCreator
+      userRole="admin"
       actionButton={(cards) => (
-        <button onClick={() => saveToDB(cards)} className="w-full bg-green-600 text-white py-5 rounded-3xl font-black text-lg shadow-xl hover:bg-green-700 transition-all">
+        <button
+          onClick={() => saveToDB(cards)}
+          className="ui-btn ui-ring-accent w-full py-4 text-sm bg-[var(--accent)] text-black font-semibold rounded-full transition active:translate-y-[1px]"
+        >
           Save {cards.length} Cards to Live Database
         </button>
-      )} 
+      )}
     />
   );
 }
