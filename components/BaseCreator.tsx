@@ -46,7 +46,7 @@ export default function BaseCreator({ userRole, actionButton }: BaseCreatorProps
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 pb-20">
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
       {/* Header */}
       <div className="px-1">
         <h2 className="text-xl font-semibold tracking-tight">Flashcard Creator</h2>
@@ -88,7 +88,7 @@ export default function BaseCreator({ userRole, actionButton }: BaseCreatorProps
             onChange={e => setNotes(e.target.value)}
           />
           <p className="text-xs ui-muted">
-            Tip: Longer transcripts work best when they’re clean (no timestamps, minimal speaker tags).
+            Feel free to add textbook snippets, lecture transcripts, or any resources you'd like to generate cards from.
           </p>
         </div>
 

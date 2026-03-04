@@ -29,10 +29,10 @@ export default function FlashcardApp() {
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       {/* Top bar */}
       <header className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+        <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-8 sm:px-6">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="ui-card flex h-9 w-9 items-center justify-center">
+            <div className="ui-card flex h-10 w-10 items-center justify-center">
               <span className="text-sm font-semibold">FC</span>
             </div>
             <div className="leading-tight">
@@ -88,7 +88,7 @@ export default function FlashcardApp() {
       </header>
 
       {/* Page body */}
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
         {/* Content surface */}
         <section className="ui-card p-4 sm:p-6">
           {view === "study" ? (

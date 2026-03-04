@@ -2,11 +2,11 @@
 
 /* ---------- Base theme (Minimal Study UI) ---------- */
 :root {
-  --bg: #f5f5f5;        /* soft neutral gray */
-  --card: #ffffff;      /* white cards */
+  --bg: #dbdbdb;
+  --card: #f4f4f4;
+  --border: #afafaf;
   --text: #111111;      /* near-black */
   --muted: #6b7280;     /* slate/gray text */
-  --border: #e5e7eb;    /* light border */
   --accent: #7ed6c5;    /* soft teal */
   --accent-hover: #5ec4b1;
   --accent-soft: #dff5f1;

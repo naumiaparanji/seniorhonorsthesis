@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
+import FlashcardMode from "@/components/FlashcardMode";
 
 type Flashcard = {
   id: string;
@@ -33,6 +34,9 @@ export default function StudyView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [minImportance, setMinImportance] = useState(1);
   const [activeCategories, setActiveCategories] = useState<string[]>(['What', 'How', 'Why']);
+
+  // Flashcard Mode
+  const [flashcardModeOpen, setFlashcardModeOpen] = useState(false);
 
   // Reset function
   const resetFilters = () => {
@@ -127,9 +131,11 @@ export default function StudyView() {
             Flashcards for VideoPoints
           </h1>
           <p className="ui-muted text-sm leading-relaxed max-w-3xl">
-            Select a course and one or more lectures. Use filters to focus on high-yield topics and question types.
-            Click any card to flip.
+            Welcome to the Flashcards website for VideoPoints. 
           </p>
+          <p className="ui-muted text-sm leading-relaxed max-w-3xl">
+            Here, you can explore and study flashcards generated from lecture transcripts of your favorite courses. Use the filters to find cards relevant to specific courses, lectures, or topics. Click on a card to flip it and reveal the answer. Happy studying!
+          </p>  
         </div>
       </div>
 
@@ -220,101 +226,118 @@ export default function StudyView() {
 
       {/* 3) REFINE + CARDS */}
       {selectedLectures.length > 0 ? (
-        <div className="space-y-6">
-
-          {/* Refine header */}
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Refine</h2>
-              <p className="text-sm ui-muted">Viewing {displayCards.length} cards</p>
-            </div>
-
-            <button
-              onClick={resetFilters}
-              className="text-sm ui-muted hover:text-black transition inline-flex items-center gap-2"
-            >
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border)] bg-white">
-                ↻
-              </span>
-              Clear filters
-            </button>
-          </div>
-
-          {/* Refine bar */}
-          <div className="ui-card p-4 sm:p-5 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
-
-            {/* Search */}
-            <div className="relative w-full lg:w-[420px]">
-              <input
-                type="text"
-                placeholder="Search questions or topics…"
-                className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <span className="absolute left-3 top-3.5 text-[var(--muted)]">⌕</span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4">
-
-              {/* Category toggles */}
-              <div className="ui-card p-1 flex items-center gap-1">
-                {['What', 'How', 'Why'].map(cat => {
-                  const active = activeCategories.includes(cat);
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
-                      className={`ui-btn ui-ring-accent px-4 py-2 text-xs ${
-                        active ? "bg-[#111111] text-white" : "bg-transparent text-[var(--muted)] hover:opacity-80"
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
+        flashcardModeOpen ? (
+          <FlashcardMode cards={displayCards} onExit={() => setFlashcardModeOpen(false)} />
+        ) : (
+          <div className="space-y-6">
+            {/* Refine header */}
+            <div className="flex items-end justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Refine</h2>
+                <p className="text-sm ui-muted">Viewing {displayCards.length} cards</p>
               </div>
 
-              {/* Importance */}
-              <div className="ui-card px-4 py-3 flex items-center gap-3">
-                <span className="text-xs ui-muted font-medium">Min importance</span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setFlashcardModeOpen(true)}
+                  disabled={displayCards.length === 0}
+                  className="ui-btn ui-btn-primary ui-ring-accent text-xs disabled:opacity-50"
+                >
+                  Launch flashcard mode
+                </button>
+
+                <button
+                  onClick={resetFilters}
+                  className="text-sm ui-muted hover:text-black transition inline-flex items-center gap-2"
+                >
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border)] bg-white">
+                    ↻
+                  </span>
+                  Clear filters
+                </button>
+              </div>
+            </div>
+
+            {/* Refine bar */}
+            <div className="ui-card p-4 sm:p-5 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+              {/* Search */}
+              <div className="relative w-full lg:w-[420px]">
                 <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={minImportance}
-                  onChange={(e) => setMinImportance(parseInt(e.target.value))}
-                  className="w-24 accent-[var(--accent)]"
+                  type="text"
+                  placeholder="Search questions or topics…"
+                  className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <span className="text-sm font-semibold">{minImportance}</span>
+                <span className="absolute left-3 top-1 text-3xl text-[var(--muted)]">⌕</span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Category toggles */}
+                <div className="ui-card p-1 flex items-center gap-1">
+                  {['What', 'How', 'Why'].map(cat => {
+                    const active = activeCategories.includes(cat);
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() =>
+                          setActiveCategories(prev =>
+                            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                          )
+                        }
+                        className={`ui-btn ui-ring-accent px-4 py-2 text-xs ${
+                          active
+                            ? "bg-[#111111] text-white"
+                            : "bg-transparent text-[var(--muted)] hover:opacity-80"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Importance */}
+                <div className="ui-card px-4 py-3 flex items-center gap-3">
+                  <span className="text-xs ui-muted font-medium">Min importance</span>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={minImportance}
+                    onChange={(e) => setMinImportance(parseInt(e.target.value))}
+                    className="w-24 accent-[var(--accent)]"
+                  />
+                  <span className="text-sm font-semibold">{minImportance}</span>
+                </div>
               </div>
             </div>
+
+            {/* Cards grid */}
+            {loading ? (
+              <div className="ui-card p-10 text-center ui-muted animate-pulse">
+                Fetching cards…
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayCards.map(card => (
+                  <FlashcardItem
+                    key={card.id}
+                    card={card}
+                    isFlipped={flippedId === card.id}
+                    onFlip={() => setFlippedId(flippedId === card.id ? null : card.id)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {displayCards.length === 0 && !loading && (
+              <div className="ui-card p-10 text-center">
+                <p className="text-sm ui-muted">No matching cards found.</p>
+              </div>
+            )}
           </div>
-
-          {/* Cards grid */}
-          {loading ? (
-            <div className="ui-card p-10 text-center ui-muted animate-pulse">
-              Fetching cards…
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayCards.map(card => (
-                <FlashcardItem
-                  key={card.id}
-                  card={card}
-                  isFlipped={flippedId === card.id}
-                  onFlip={() => setFlippedId(flippedId === card.id ? null : card.id)}
-                />
-              ))}
-            </div>
-          )}
-
-          {displayCards.length === 0 && !loading && (
-            <div className="ui-card p-10 text-center">
-              <p className="text-sm ui-muted">No matching cards found.</p>
-            </div>
-          )}
-        </div>
+        )
       ) : (
         <div className="ui-card p-10 text-center">
           <p className="text-sm ui-muted">Select one or more lectures to begin.</p>
@@ -330,7 +353,7 @@ function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped
       <div className={`relative w-full h-full transition-transform duration-700 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
 
         {/* FRONT */}
-        <div className="absolute inset-0 backface-hidden ui-card p-6 flex flex-col justify-between overflow-hidden">
+        <div className="absolute inset-0 backface-hidden ui-card !bg-white p-6 flex flex-col justify-between overflow-hidden">
           {/* Top meta */}
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
