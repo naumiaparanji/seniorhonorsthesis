@@ -62,7 +62,7 @@ export default function FlashcardApp() {
                   : "bg-transparent text-[var(--muted)] hover:opacity-80"
               }`}
             >
-              Creator
+              Create
             </button>
           </div>
 
