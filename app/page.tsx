@@ -6,6 +6,7 @@ import StudyView from '@/components/StudyView';
 import CreatorViewAdmin from '@/components/CreatorViewAdmin';
 import CreatorViewStudent from '@/components/CreatorViewStudent';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function FlashcardApp() {
   const [view, setView] = useState<'study' | 'create'>('study');
@@ -32,8 +33,8 @@ export default function FlashcardApp() {
         <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-8 sm:px-6">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="ui-card flex h-10 w-10 items-center justify-center">
-              <span className="text-sm font-semibold">FC</span>
+            <div className="ui-card flex h-10 w-10 items-center justify-center overflow-hidden">
+              <Image src="/flashcardslogo.png" alt="Flashcards logo" width={40} height={40} className="object-contain" />
             </div>
             <div className="leading-tight">
               <div className="text-sm font-semibold">Flashcards</div>

@@ -126,16 +126,40 @@ export default function StudyView() {
 
       {/* 1) HERO / INTRO (minimal) */}
       <div className="ui-card p-6 sm:p-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            Flashcards for VideoPoints
-          </h1>
-          <p className="ui-muted text-sm leading-relaxed max-w-3xl">
-            Welcome to the Flashcards website for VideoPoints. 
-          </p>
-          <p className="ui-muted text-sm leading-relaxed max-w-3xl">
-            Here, you can explore and study flashcards generated from lecture transcripts of your favorite courses. Use the filters to find cards relevant to specific courses, lectures, or topics. Click on a card to flip it and reveal the answer. Happy studying!
-          </p>  
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+
+          {/* LEFT SIDE — TEXT */}
+          <div className="flex flex-col gap-2 max-w-3xl">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+              Flashcards for VideoPoints
+            </h1>
+
+            <p className="ui-muted text-sm leading-relaxed">
+              Welcome to the Flashcards website for VideoPoints.
+            </p>
+
+            <p className="ui-muted text-sm leading-relaxed">
+              Here, you can explore and study flashcards generated from lecture transcripts of your favorite courses.
+              Use the filters to find cards relevant to specific courses, lectures, or topics. Click on a card to flip it
+              and reveal the answer. Happy studying!
+            </p>
+          </div>
+
+          {/* RIGHT SIDE — SURVEY CTA */}
+          <div className="flex md:flex-col items-start md:items-end">
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSesVjOYthygyJGHn5IgXMlH_j7Z87RW-2a8GMF1Jixw_JbIGw/viewform?usp=publish-editor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:bg-[var(--accent-soft)] transition"
+            >
+              Take Research Survey
+            </a>
+
+            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> Please help improve this research project by sharing your feedback. </p>
+            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> Survey takes 2 minutes and responses are anonymous. Thank you! </p>
+          </div>
+
         </div>
       </div>
 
@@ -150,9 +174,7 @@ export default function StudyView() {
             </div>
             <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
               {availableCourses.map(c => (
-                <button
-                  key={c}
-                  onClick={() => { setSelectedCourses([c]); setSelectedLectures([]); setSelectedTopics([]); }}
+                <button key={c} onClick={() => { setSelectedCourses([c]); setSelectedLectures([]); setSelectedTopics([]); }}
                   className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
                     selectedCourses.includes(c)
                       ? "bg-[var(--accent-soft)] text-black"
@@ -172,9 +194,7 @@ export default function StudyView() {
             </div>
             <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
               {availableLectures.map(l => (
-                <button
-                  key={l}
-                  onClick={() => {
+                <button key={l} onClick={() => {
                     const next = selectedLectures.includes(l) ? selectedLectures.filter(x => x !== l) : [...selectedLectures, l];
                     setSelectedLectures(next);
                     setSelectedTopics([]);
@@ -238,12 +258,10 @@ export default function StudyView() {
               </div>
 
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setFlashcardModeOpen(true)}
-                  disabled={displayCards.length === 0}
+                <button onClick={() => setFlashcardModeOpen(true)} disabled={displayCards.length === 0}
                   className="ui-btn ui-btn-primary ui-ring-accent text-xs disabled:opacity-50"
                 >
-                  Launch flashcard mode
+                  Launch Flashcard mode
                 </button>
 
                 <button
@@ -263,11 +281,8 @@ export default function StudyView() {
               {/* Search */}
               <div className="relative w-full lg:w-[420px]">
                 <input
-                  type="text"
-                  placeholder="Search questions or topics…"
-                  className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  type="text" placeholder="Search questions or topics…" className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <span className="absolute left-3 top-1 text-3xl text-[var(--muted)]">⌕</span>
               </div>
@@ -278,12 +293,7 @@ export default function StudyView() {
                   {['What', 'How', 'Why'].map(cat => {
                     const active = activeCategories.includes(cat);
                     return (
-                      <button
-                        key={cat}
-                        onClick={() =>
-                          setActiveCategories(prev =>
-                            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-                          )
+                      <button key={cat} onClick={() => setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
                         }
                         className={`ui-btn ui-ring-accent px-4 py-2 text-xs ${
                           active
@@ -300,14 +310,7 @@ export default function StudyView() {
                 {/* Importance */}
                 <div className="ui-card px-4 py-3 flex items-center gap-3">
                   <span className="text-xs ui-muted font-medium">Min importance</span>
-                  <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    value={minImportance}
-                    onChange={(e) => setMinImportance(parseInt(e.target.value))}
-                    className="w-24 accent-[var(--accent)]"
-                  />
+                  <input type="range" min="1" max="5" value={minImportance} onChange={(e) => setMinImportance(parseInt(e.target.value))} className="w-24 accent-[var(--accent)]"/>
                   <span className="text-sm font-semibold">{minImportance}</span>
                 </div>
               </div>
@@ -315,16 +318,11 @@ export default function StudyView() {
 
             {/* Cards grid */}
             {loading ? (
-              <div className="ui-card p-10 text-center ui-muted animate-pulse">
-                Fetching cards…
-              </div>
+              <div className="ui-card p-10 text-center ui-muted animate-pulse"> Fetching cards… </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayCards.map(card => (
-                  <FlashcardItem
-                    key={card.id}
-                    card={card}
-                    isFlipped={flippedId === card.id}
+                  <FlashcardItem key={card.id} card={card} isFlipped={flippedId === card.id}
                     onFlip={() => setFlippedId(flippedId === card.id ? null : card.id)}
                   />
                 ))}
@@ -372,8 +370,7 @@ function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped
 
             <div className="flex flex-wrap gap-1.5 max-h-14 overflow-y-auto">
               {card.topics.map(t => (
-                <span
-                  key={t}
+                <span key={t}
                   className="text-[11px] px-2 py-1 rounded-full bg-[var(--accent-soft)] text-black/80"
                 >
                   {t}
