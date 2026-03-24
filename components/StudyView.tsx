@@ -148,16 +148,16 @@ export default function StudyView() {
           {/* RIGHT SIDE — SURVEY CTA */}
           <div className="flex md:flex-col items-start md:items-end">
             <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSesVjOYthygyJGHn5IgXMlH_j7Z87RW-2a8GMF1Jixw_JbIGw/viewform?usp=publish-editor"
+              href="https://youtu.be/l2PbtwJFdFA"
               target="_blank"
               rel="noopener noreferrer"
               className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:bg-[var(--accent-soft)] transition"
             >
-              Take Research Survey
+              Watch demo video!
             </a>
 
-            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> Please help improve this research project by sharing your feedback. </p>
-            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> Survey takes 2 minutes and responses are anonymous. Thank you! </p>
+            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> This is a quick video going over the features of this website. </p>
+            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> Runtime is approximately 5 minutes. Please contact us with any questions. </p>
           </div>
 
         </div>
