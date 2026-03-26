@@ -34,7 +34,7 @@ export default function FlashcardApp() {
           {/* Brand */}
           <div className="flex items-center gap-3">
             <div className="ui-card flex h-10 w-10 items-center justify-center overflow-hidden">
-              <Image src="/flashcardslogo.png" alt="Flashcards logo" width={40} height={40} className="object-contain" />
+              <Image src="/FlashcardsWebsiteLogo.png" alt="Flashcards logo" width={40} height={40} className="object-contain" />
             </div>
             <div className="leading-tight">
               <div className="text-sm font-semibold">Flashcards</div>

@@ -176,7 +176,7 @@ const handleTopicToggle = (topic: string) => {
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
           <div className="ui-card p-4 shadow-2xl border-2 border-[var(--accent)] bg-white flex flex-col items-center gap-3 text-center">
             <p className="text-sm font-medium text-black">
-              👋 After using flashcards, please be sure to leave quick feedback at the bottom of the page so we can keep improving!
+              👋 Hi, please be sure to leave a quick feedback at the bottom of the page after you're done studying!
             </p>
             <button 
               onClick={closePopup}

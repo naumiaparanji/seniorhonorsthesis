@@ -19,21 +19,25 @@ export default function StudyViewHero() {
         </div>
 
         <div className="flex md:flex-col items-start md:items-end">
-          <a
+        <a
             href="https://youtu.be/l2PbtwJFdFA"
             target="_blank"
             rel="noopener noreferrer"
-            className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:bg-[var(--accent-soft)] transition"
-          >
-            Watch demo video!
-          </a>
+            className="group relative block w-full md:w-[280px]"
+        >
+            <img
+            src="/ThumbnailDemoVideo.png"
+            alt="Demo video thumbnail"
+            className="w-full h-auto rounded-xl border border-[var(--border)] shadow-sm group-hover:opacity-90 transition"
+            />
 
-          <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block">
-            This is a quick video going over the features of this website.
-          </p>
-          <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block">
-            Runtime is approximately 5 minutes. Please contact us with any questions.
-          </p>
+            {/* Optional overlay button */}
+            <div className="absolute inset-0 flex items-end justify-center pb-3">
+            <span className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-sm font-medium shadow group-hover:scale-105 transition">
+                ▶ Watch Demo
+            </span>
+            </div>
+        </a>
         </div>
       </div>
     </div>
