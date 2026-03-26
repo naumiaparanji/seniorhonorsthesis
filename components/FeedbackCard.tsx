@@ -97,7 +97,7 @@ export default function FeedbackCard({
                   ? "bg-[#111111] text-white"
                   : "bg-white text-[var(--muted)]"
               }`}
-            >
+            > 
               {num}
             </button>
           ))}
