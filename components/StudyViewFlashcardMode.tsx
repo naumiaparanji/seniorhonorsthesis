@@ -68,7 +68,6 @@ export default function FlashcardMode({
   return (
     <div className="space-y-6">
       <div className="ui-card p-6 sm:p-8">
-        {/* Top controls */}
         <div className="flex items-center justify-between gap-4">
           <div>
             <div className="text-sm font-semibold">Flashcard mode</div>
@@ -77,20 +76,13 @@ export default function FlashcardMode({
             </div>
           </div>
 
-          <button
-            onClick={onExit}
-            className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:opacity-80"
-          >
+          <button onClick={onExit} className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:opacity-80">
             Exit
           </button>
         </div>
 
-        {/* Single card */}
         <div className="mt-6 flex items-center justify-center">
-          <div
-            onClick={() => setFlipped((f) => !f)}
-            className="w-full max-w-2xl h-[420px] perspective-1000"
-          >
+          <div onClick={() => setFlipped((f) => !f)} className="w-full max-w-2xl h-[420px] perspective-1000" >
             <div className={`relative w-full h-full transition-transform duration-700 preserve-3d ${flipped ? "rotate-y-180" : ""}`}>
               {/* FRONT */}
               <div className="absolute inset-0 backface-hidden ui-card p-8 flex flex-col justify-between">
@@ -128,7 +120,7 @@ export default function FlashcardMode({
                 </div>
 
                 <div className="text-center text-xs ui-muted">
-                  Tip: ← / → to navigate, Space to flip, Esc to exit
+                  Tip: ← / → to navigate, Click to flip, Esc to exit
                 </div>
               </div>
             </div>
@@ -137,24 +129,15 @@ export default function FlashcardMode({
 
         {/* Navigation */}
         <div className="mt-6 flex items-center justify-between">
-          <button
-            onClick={prev}
-            className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:opacity-80"
-          >
+          <button onClick={prev} className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:opacity-80">
             ← Prev
           </button>
 
-          <button
-            onClick={() => setFlipped((f) => !f)}
-            className="ui-btn ui-btn-primary ui-ring-accent text-sm"
-          >
+          <button onClick={() => setFlipped((f) => !f)} className="ui-btn ui-btn-primary ui-ring-accent text-sm">
             Flip
           </button>
 
-          <button
-            onClick={next}
-            className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:opacity-80"
-          >
+          <button onClick={next} className="ui-btn ui-ring-accent border border-[var(--border)] bg-white text-sm hover:opacity-80">
             Next →
           </button>
         </div>
