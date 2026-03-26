@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
 import FlashcardMode from "@/components/FlashcardMode";
+import FeedbackCard from "@/components/FeedbackCard";
 
 type Flashcard = {
   id: string;
@@ -38,7 +39,6 @@ export default function StudyView() {
   // Flashcard Mode
   const [flashcardModeOpen, setFlashcardModeOpen] = useState(false);
 
-  // Reset function
   const resetFilters = () => {
     setSearchQuery('');
     setMinImportance(1);
@@ -68,22 +68,26 @@ export default function StudyView() {
     fetchLectures();
   }, [selectedCourses]);
 
-  // 3. Fetch Topics based on Course + ALL Selected Lectures
+  // 3. Fetch Topics based on Course + Selected Lectures
   useEffect(() => {
     const fetchTopics = async () => {
       if (selectedLectures.length === 0) {
         setAvailableTopics([]);
         return;
       }
-      let query = supabase.from('flashcards').select('topics').in('course', selectedCourses).in('lecture', selectedLectures);
-      const { data } = await query;
+      const { data } = await supabase
+        .from('flashcards')
+        .select('topics')
+        .in('course', selectedCourses)
+        .in('lecture', selectedLectures);
+
       const flattened = data?.flatMap(i => i.topics) || [];
       setAvailableTopics(Array.from(new Set(flattened)).filter(Boolean) as string[]);
     };
     fetchTopics();
   }, [selectedCourses, selectedLectures]);
 
-  // 4. Fetch the actual Cards for all selected lectures
+  // 4. Fetch cards
   useEffect(() => {
     const fetchCards = async () => {
       if (selectedLectures.length === 0) {
@@ -91,8 +95,12 @@ export default function StudyView() {
         return;
       }
       setLoading(true);
-      let query = supabase.from('flashcards').select('*').in('course', selectedCourses).in('lecture', selectedLectures);
-      const { data } = await query;
+      const { data } = await supabase
+        .from('flashcards')
+        .select('*')
+        .in('course', selectedCourses)
+        .in('lecture', selectedLectures);
+
       if (data) setAllFetchedCards(data);
       setLoading(false);
     };
@@ -102,7 +110,8 @@ export default function StudyView() {
   // 5. Apply Client-side Filters
   useEffect(() => {
     let results = allFetchedCards.filter(card => {
-      const matchesTopic = selectedTopics.length === 0 || card.topics.some(t => selectedTopics.includes(t));
+      const matchesTopic =
+        selectedTopics.length === 0 || card.topics.some(t => selectedTopics.includes(t));
       const matchesCategory = activeCategories.includes(card.category);
       const matchesImportance = card.importance >= minImportance;
       const matchesSearch =
@@ -113,8 +122,10 @@ export default function StudyView() {
     });
 
     results.sort((a, b) => {
-      const catOrder: any = { 'What': 0, 'How': 1, 'Why': 2 };
-      if (catOrder[a.category] !== catOrder[b.category]) return catOrder[a.category] - catOrder[b.category];
+      const catOrder: Record<string, number> = { What: 0, How: 1, Why: 2 };
+      if (catOrder[a.category] !== catOrder[b.category]) {
+        return catOrder[a.category] - catOrder[b.category];
+      }
       return b.importance - a.importance;
     });
 
@@ -123,12 +134,9 @@ export default function StudyView() {
 
   return (
     <div className="space-y-8">
-
-      {/* 1) HERO / INTRO (minimal) */}
+      {/* 1) HERO / INTRO */}
       <div className="ui-card p-6 sm:p-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-
-          {/* LEFT SIDE — TEXT */}
           <div className="flex flex-col gap-2 max-w-3xl">
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
               Flashcards for VideoPoints
@@ -145,7 +153,6 @@ export default function StudyView() {
             </p>
           </div>
 
-          {/* RIGHT SIDE — SURVEY CTA */}
           <div className="flex md:flex-col items-start md:items-end">
             <a
               href="https://youtu.be/l2PbtwJFdFA"
@@ -156,17 +163,19 @@ export default function StudyView() {
               Watch demo video!
             </a>
 
-            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> This is a quick video going over the features of this website. </p>
-            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block"> Runtime is approximately 5 minutes. Please contact us with any questions. </p>
+            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block">
+              This is a quick video going over the features of this website.
+            </p>
+            <p className="text-sm ui-muted mt-2 max-w-[280px] text-right hidden md:block">
+              Runtime is approximately 5 minutes. Please contact us with any questions.
+            </p>
           </div>
-
         </div>
       </div>
 
       {/* 2) SELECTION GRID */}
       <div className="ui-card p-6 sm:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
           {/* Course */}
           <div className="space-y-3">
             <div className="text-[11px] font-semibold tracking-widest uppercase ui-muted">
@@ -174,7 +183,14 @@ export default function StudyView() {
             </div>
             <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
               {availableCourses.map(c => (
-                <button key={c} onClick={() => { setSelectedCourses([c]); setSelectedLectures([]); setSelectedTopics([]); }}
+                <button
+                  key={c}
+                  onClick={() => {
+                    setSelectedCourses([c]);
+                    setSelectedLectures([]);
+                    setSelectedTopics([]);
+                    setFlashcardModeOpen(false);
+                  }}
                   className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
                     selectedCourses.includes(c)
                       ? "bg-[var(--accent-soft)] text-black"
@@ -194,10 +210,15 @@ export default function StudyView() {
             </div>
             <div className="flex flex-wrap gap-2 max-h-50 overflow-y-auto pr-1 topic-scroll">
               {availableLectures.map(l => (
-                <button key={l} onClick={() => {
-                    const next = selectedLectures.includes(l) ? selectedLectures.filter(x => x !== l) : [...selectedLectures, l];
+                <button
+                  key={l}
+                  onClick={() => {
+                    const next = selectedLectures.includes(l)
+                      ? selectedLectures.filter(x => x !== l)
+                      : [...selectedLectures, l];
                     setSelectedLectures(next);
                     setSelectedTopics([]);
+                    setFlashcardModeOpen(false);
                   }}
                   className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
                     selectedLectures.includes(l)
@@ -221,9 +242,12 @@ export default function StudyView() {
               {selectedLectures.length > 0 ? (
                 availableTopics.length > 0 ? (
                   availableTopics.map(t => (
-                    <button
-                      key={t}
-                      onClick={() => setSelectedTopics(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])}
+                    <button key={t} onClick={() => {
+                        setSelectedTopics(prev =>
+                          prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]
+                        );
+                        setFlashcardModeOpen(false);
+                      }}
                       className={`ui-btn ui-ring-accent px-3 py-2 text-xs border border-[var(--border)] ${
                         selectedTopics.includes(t)
                           ? "bg-[var(--accent-soft)] text-black"
@@ -247,7 +271,12 @@ export default function StudyView() {
       {/* 3) REFINE + CARDS */}
       {selectedLectures.length > 0 ? (
         flashcardModeOpen ? (
-          <FlashcardMode cards={displayCards} onExit={() => setFlashcardModeOpen(false)} />
+          <FlashcardMode
+            cards={displayCards}
+            onExit={() => setFlashcardModeOpen(false)}
+            courseId={selectedCourses[0] || "Unknown"}
+            lectures={selectedLectures}
+          />
         ) : (
           <div className="space-y-6">
             {/* Refine header */}
@@ -258,7 +287,9 @@ export default function StudyView() {
               </div>
 
               <div className="flex items-center gap-3">
-                <button onClick={() => setFlashcardModeOpen(true)} disabled={displayCards.length === 0}
+                <button
+                  onClick={() => setFlashcardModeOpen(true)}
+                  disabled={displayCards.length === 0}
                   className="ui-btn ui-btn-primary ui-ring-accent text-xs disabled:opacity-50"
                 >
                   Launch Flashcard mode
@@ -278,27 +309,31 @@ export default function StudyView() {
 
             {/* Refine bar */}
             <div className="ui-card p-4 sm:p-5 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
-              {/* Search */}
               <div className="relative w-full lg:w-[420px]">
                 <input
-                  type="text" placeholder="Search questions or topics…" className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                  value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  type="text"
+                  placeholder="Search questions or topics…"
+                  className="w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <span className="absolute left-3 top-1 text-3xl text-[var(--muted)]">⌕</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-4">
-                {/* Category toggles */}
                 <div className="ui-card p-1 flex items-center gap-1">
                   {['What', 'How', 'Why'].map(cat => {
                     const active = activeCategories.includes(cat);
                     return (
-                      <button key={cat} onClick={() => setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
+                      <button
+                        key={cat}
+                        onClick={() =>
+                          setActiveCategories(prev =>
+                            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                          )
                         }
                         className={`ui-btn ui-ring-accent px-4 py-2 text-xs ${
-                          active
-                            ? "bg-[#111111] text-white"
-                            : "bg-transparent text-[var(--muted)] hover:opacity-80"
+                          active ? "bg-[#111111] text-white" : "bg-transparent text-[var(--muted)] hover:opacity-80"
                         }`}
                       >
                         {cat}
@@ -307,10 +342,16 @@ export default function StudyView() {
                   })}
                 </div>
 
-                {/* Importance */}
                 <div className="ui-card px-4 py-3 flex items-center gap-3">
                   <span className="text-xs ui-muted font-medium">Min importance</span>
-                  <input type="range" min="1" max="5" value={minImportance} onChange={(e) => setMinImportance(parseInt(e.target.value))} className="w-24 accent-[var(--accent)]"/>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={minImportance}
+                    onChange={(e) => setMinImportance(parseInt(e.target.value))}
+                    className="w-24 accent-[var(--accent)]"
+                  />
                   <span className="text-sm font-semibold">{minImportance}</span>
                 </div>
               </div>
@@ -318,11 +359,16 @@ export default function StudyView() {
 
             {/* Cards grid */}
             {loading ? (
-              <div className="ui-card p-10 text-center ui-muted animate-pulse"> Fetching cards… </div>
+              <div className="ui-card p-10 text-center ui-muted animate-pulse">
+                Fetching cards…
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayCards.map(card => (
-                  <FlashcardItem key={card.id} card={card} isFlipped={flippedId === card.id}
+                  <FlashcardItem
+                    key={card.id}
+                    card={card}
+                    isFlipped={flippedId === card.id}
                     onFlip={() => setFlippedId(flippedId === card.id ? null : card.id)}
                   />
                 ))}
@@ -333,6 +379,14 @@ export default function StudyView() {
               <div className="ui-card p-10 text-center">
                 <p className="text-sm ui-muted">No matching cards found.</p>
               </div>
+            )}
+
+            {displayCards.length > 0 && !loading && (
+              <FeedbackCard
+                courseId={selectedCourses[0] || "Unknown"}
+                lectures={selectedLectures}
+                cardCount={displayCards.length}
+              />
             )}
           </div>
         )
@@ -345,19 +399,23 @@ export default function StudyView() {
   );
 }
 
-function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped: boolean, onFlip: () => void }) {
+function FlashcardItem({
+  card,
+  isFlipped,
+  onFlip,
+}: {
+  card: Flashcard;
+  isFlipped: boolean;
+  onFlip: () => void;
+}) {
   return (
     <div onClick={onFlip} className="h-72 cursor-pointer perspective-1000 group">
       <div className={`relative w-full h-full transition-transform duration-700 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
-
         {/* FRONT */}
         <div className="absolute inset-0 backface-hidden ui-card !bg-white p-6 flex flex-col justify-between overflow-hidden">
-          {/* Top meta */}
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[11px] font-medium ui-muted truncate">
-                {card.lecture}
-              </span>
+              <span className="text-[11px] font-medium ui-muted truncate">{card.lecture}</span>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] px-2 py-1 rounded-full border border-[var(--border)] bg-white ui-muted">
                   {card.category}
@@ -370,7 +428,8 @@ function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped
 
             <div className="flex flex-wrap gap-1.5 max-h-14 overflow-y-auto">
               {card.topics.map(t => (
-                <span key={t}
+                <span
+                  key={t}
                   className="text-[11px] px-2 py-1 rounded-full bg-[var(--accent-soft)] text-black/80"
                 >
                   {t}
@@ -379,14 +438,10 @@ function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped
             </div>
           </div>
 
-          {/* Question */}
           <div className="flex-1 flex items-center justify-center text-center px-2">
-            <p className="text-lg font-semibold leading-snug">
-              {card.question}
-            </p>
+            <p className="text-lg font-semibold leading-snug">{card.question}</p>
           </div>
 
-          {/* Hint */}
           <div className="text-center">
             <p className="text-xs ui-muted">Click to reveal answer</p>
           </div>
@@ -399,9 +454,7 @@ function FlashcardItem({ card, isFlipped, onFlip }: { card: Flashcard, isFlipped
           </div>
 
           <div className="flex-1 flex items-center justify-center text-center px-2">
-            <p className="text-base leading-relaxed">
-              {card.answer}
-            </p>
+            <p className="text-base leading-relaxed">{card.answer}</p>
           </div>
 
           <div className="text-center">
