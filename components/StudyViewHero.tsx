@@ -1,3 +1,5 @@
+import { MousePointerClick } from "lucide-react";
+
 export default function StudyViewHero() {
   return (
     <div className="ui-card p-6 sm:p-8">
@@ -8,15 +10,16 @@ export default function StudyViewHero() {
           </h1>
 
           <p className="ui-muted text-sm leading-relaxed">
-            Welcome to the Flashcards website for VideoPoints.
+            Welcome! Explore and study flashcards generated from lectures of your favorite courses.
+            Use the filters to find cards relevant to specific courses, lectures, or topics. Happy studying:)
           </p>
 
-          <p className="ui-muted text-sm leading-relaxed">
-            Here, you can explore and study flashcards generated from lecture transcripts of your favorite courses.
-            Use the filters to find cards relevant to specific courses, lectures, or topics. Click on a card to flip it
-            and reveal the answer. Happy studying!
+          <p className="ui-muted text-sm leading-relaxed flex items-start gap-2">
+            <MousePointerClick className="w-8 h-8 mt-1" />
+            <span> After every session, please consider{" "} <strong>leaving feedback at the bottom of the page</strong>{" "}
+            to help us improve the flashcards and your studying experience! </span>
           </p>
-        </div>
+            </div>
 
         <div className="flex md:flex-col items-start md:items-end">
         <a

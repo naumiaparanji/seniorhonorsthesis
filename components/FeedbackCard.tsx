@@ -64,14 +64,11 @@ export default function FeedbackCard({
   return (
     <div className="ui-card p-6 space-y-5">
       <div>
-        <h3 className="text-lg font-semibold">Quick Feedback</h3>
-        <p className="text-sm ui-muted">
-          Help us improve these flashcards by sharing a quick rating.
-        </p>
+        <h3 className="text-lg font-semibold">Session Feedback</h3>
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium">How helpful were these flashcards?</p>
+        <p className="text-sm font-medium">How helpful are these flashcards?</p>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((num) => (
             <button key={num} type="button" onClick={() => setHelpfulnessRating(num)}
@@ -88,7 +85,7 @@ export default function FeedbackCard({
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium">How would you rate the quality and/or accuracy?</p>
+        <p className="text-sm font-medium">How would you rate the quality of these flashcards?</p>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((num) => (
             <button key={num} type="button" onClick={() => setQualityRating(num)}

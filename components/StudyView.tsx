@@ -25,7 +25,7 @@ export default function StudyView() {
   const [flippedId, setFlippedId] = useState<string | null>(null);
   const [allFetchedCards, setAllFetchedCards] = useState<Flashcard[]>([]);
   const [displayCards, setDisplayCards] = useState<Flashcard[]>([]);
-  const [showFeedbackReminder, setShowFeedbackReminder] = useState(false);
+  //const [showFeedbackReminder, setShowFeedbackReminder] = useState(false);
   const [availableCourses, setAvailableCourses] = useState<string[]>([]);
   const [availableLectures, setAvailableLectures] = useState<string[]>([]);
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
@@ -42,19 +42,6 @@ export default function StudyView() {
     setMinImportance(1);
     setActiveCategories(['What', 'How', 'Why']);
     setSelectedTopics([]);
-  };
-
-  // Feedback reminder popup
-  useEffect(() => {
-    const hasSeenPopup = sessionStorage.getItem('feedback_reminder_seen');
-    if (!hasSeenPopup) {
-      setShowFeedbackReminder(true);
-    }
-  }, []);
-
-  const closePopup = () => {
-    setShowFeedbackReminder(false);
-    sessionStorage.setItem('feedback_reminder_seen', 'true');
   };
 
   // 1. Initial Load: Fetch Available Courses
@@ -171,22 +158,6 @@ const handleTopicToggle = (topic: string) => {
 {/* Study View Return Wraper */}
   return (
     <div className="space-y-8">
-
-      {showFeedbackReminder && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
-          <div className="ui-card p-4 shadow-2xl border-2 border-[var(--accent)] bg-white flex flex-col items-center gap-3 text-center">
-            <p className="text-sm font-medium text-black">
-              👋 Hi, please be sure to leave a quick feedback at the bottom of the page after you're done studying!
-            </p>
-            <button 
-              onClick={closePopup}
-              className="ui-btn ui-btn-primary px-6 py-1.5 text-xs shadow-sm hover:scale-105 transition-transform"
-            >
-              Got it!
-            </button>
-          </div>
-        </div>
-      )}
 
       <StudyViewHero />
 
