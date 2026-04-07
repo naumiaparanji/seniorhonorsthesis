@@ -19,27 +19,26 @@ export default function StudyViewHero() {
             <span> After every session, please consider{" "} <strong>leaving feedback at the bottom of the page</strong>{" "}
             to help us improve the flashcards and your studying experience! </span>
           </p>
+
+          <p className="ui-muted text-sm leading-relaxed bg-gray-300 p-3 rounded-md border-l-4 border-gray-700">
+          Please consider taking{' '}
+          <a 
+            href="https://docs.google.com/forms/d/e/1FAIpQLSdI8OU_1fhDBZsmxIWz0VIbRyHB-wrRkMMPVZfWfakOH02WqA/viewform?usp=header" 
+            target="_blank"  rel="noopener noreferrer"  className="underline font-medium text-black-1000" >
+            this research survey </a> 
+          {' '}as well; it helps us understand how students use the flashcards and how we can improve them!
+          </p>
             </div>
 
-        <div className="flex md:flex-col items-start md:items-end">
+        <div className="flex flex-col items-center md:items-end w-full md:w-[280px] gap-3">
+        <a 
+            href="https://youtu.be/l2PbtwJFdFA" target="_blank" rel="noopener noreferrer" className="group block w-full"  >
+            <img src="/ThumbnailDemoVideo.png" alt="Demo video thumbnail" className="w-full h-auto rounded-xl border border-[var(--border)] shadow-sm group-hover:opacity-90 transition"/> 
+        </a>
         <a
-            href="https://youtu.be/l2PbtwJFdFA"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative block w-full md:w-[280px]"
-        >
-            <img
-            src="/ThumbnailDemoVideo.png"
-            alt="Demo video thumbnail"
-            className="w-full h-auto rounded-xl border border-[var(--border)] shadow-sm group-hover:opacity-90 transition"
-            />
-
-            {/* Optional overlay button */}
-            <div className="absolute inset-0 flex items-end justify-center pb-3">
-            <span className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-sm font-medium shadow group-hover:scale-105 transition">
-                ▶ Watch Demo
-            </span>
-            </div>
+            href="https://youtu.be/l2PbtwJFdFA" target="_blank" rel="noopener noreferrer" className="w-full flex justify-center bg-white border border-[var(--border)] px-4 py-2 
+            rounded-full text-sm font-medium shadow hover:bg-gray-50 hover:scale-105 transition">
+            ▶ Watch Demo
         </a>
         </div>
       </div>
