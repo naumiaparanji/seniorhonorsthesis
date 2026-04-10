@@ -7,7 +7,7 @@ export async function POST(req) {
     const { notes, course, lecture, existingTopics } = await req.json();
 
     const model = genAI.getGenerativeModel(
-        { model: "gemini-2.5-pro" }, 
+        { model: "gemini-2.5-flash" }, 
         { apiVersion: 'v1' } 
     );
 
