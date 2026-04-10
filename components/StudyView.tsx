@@ -56,13 +56,20 @@ export default function StudyView() {
   // 2. Fetch Lectures based on Course
   useEffect(() => {
     const fetchLectures = async () => {
-      if (selectedCourses.length === 0) {
-        setAvailableLectures([]);
-        return;
-      }
-      const { data } = await supabase.from('flashcards').select('lecture').in('course', selectedCourses);
-      setAvailableLectures(Array.from(new Set(data?.map(i => i.lecture))).filter(Boolean) as string[]);
+      if (selectedCourses.length === 0) return setAvailableLectures([]);
+
+      const { data } = await supabase
+        .from('flashcards')
+        .select('lecture')
+        .in('course', selectedCourses);
+
+      const lectures = Array.from(new Set(data?.map(d => d.lecture)))
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })) as string[];
+
+      setAvailableLectures(lectures);
     };
+
     fetchLectures();
   }, [selectedCourses]);
 
