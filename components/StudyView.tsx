@@ -37,6 +37,31 @@ export default function StudyView() {
   const [activeCategories, setActiveCategories] = useState<string[]>(['What', 'How', 'Why']);
   const [flashcardModeOpen, setFlashcardModeOpen] = useState(false);
 
+  const fetchAllRows = async (queryBuilder: any) => {
+    let allData: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+
+    while (true) {
+      const { data, error } = await queryBuilder.range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error("Pagination error:", error);
+        break;
+      }
+
+      if (!data || data.length === 0) break;
+
+      allData = [...allData, ...data];
+
+      if (data.length < pageSize) break;
+
+      from += pageSize;
+    }
+
+    return allData;
+  };
+
   const resetFilters = () => {
     setSearchQuery('');
     setMinImportance(1);
@@ -47,7 +72,10 @@ export default function StudyView() {
   // 1. Initial Load: Fetch Available Courses
   useEffect(() => {
     const fetchCourses = async () => {
-      const { data } = await supabase.from('flashcards').select('course');
+      const data = await fetchAllRows(
+        supabase.from('flashcards').select('course')
+      );
+
       setAvailableCourses(Array.from(new Set(data?.map(i => i.course))).filter(Boolean) as string[]);
     };
     fetchCourses();
@@ -58,10 +86,12 @@ export default function StudyView() {
     const fetchLectures = async () => {
       if (selectedCourses.length === 0) return setAvailableLectures([]);
 
-      const { data } = await supabase
-        .from('flashcards')
-        .select('lecture')
-        .in('course', selectedCourses);
+      const data = await fetchAllRows(
+        supabase
+          .from('flashcards')
+          .select('lecture')
+          .in('course', selectedCourses)
+      );
 
       const lectures = Array.from(new Set(data?.map(d => d.lecture)))
         .filter(Boolean)
@@ -80,11 +110,14 @@ export default function StudyView() {
         setAvailableTopics([]);
         return;
       }
-      const { data } = await supabase
-        .from('flashcards')
-        .select('topics')
-        .in('course', selectedCourses)
-        .in('lecture', selectedLectures);
+
+      const data = await fetchAllRows(
+        supabase
+          .from('flashcards')
+          .select('topics')
+          .in('course', selectedCourses)
+          .in('lecture', selectedLectures)
+      );
 
       const flattened = data?.flatMap(i => i.topics) || [];
       setAvailableTopics(Array.from(new Set(flattened)).filter(Boolean) as string[]);
@@ -100,11 +133,14 @@ export default function StudyView() {
         return;
       }
       setLoading(true);
-      const { data } = await supabase
-        .from('flashcards')
-        .select('*')
-        .in('course', selectedCourses)
-        .in('lecture', selectedLectures);
+
+      const data = await fetchAllRows(
+        supabase
+          .from('flashcards')
+          .select('*')
+          .in('course', selectedCourses)
+          .in('lecture', selectedLectures)
+      );
 
       if (data) setAllFetchedCards(data);
       setLoading(false);
