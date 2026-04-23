@@ -32,7 +32,7 @@ export async function POST(req) {
                         - RULE: Do not use tag variations (e.g., use 'Memory' instead of 'Memory Mgt').
                     PRINCIPLES:
                     1. HIGH-YIELD: Focus on definitions, processes, and causal relationships. Prioritize depth and exam utility over covering every minor sentence.
-                    2. ATOMICITY: Each card must cover discrete idea. Split complex concepts into multiple cards. If resulting in too many cards, consider condensing some info into a single card, but never combine unrelated ideas into one card.
+                    2. ATOMICITY: Each card must cover discrete idea. Split complex concepts into multiple cards.
                     3. FORMAT VARIETY (no labeling, just content): 
                         - Use basic (Question/Answer) as the primary format. 
                         - Use blank (fill-in-the-blank using [___]) ONLY for technical terminology or specific parts of a process 
